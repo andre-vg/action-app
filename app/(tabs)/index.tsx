@@ -5,15 +5,10 @@ import { Button, ButtonText, View, Text, Heading } from "@gluestack-ui/themed";
 export default function TabOneScreen() {
   return (
     <View style={styles.container}>
-      <Text lineHeight={'$lg'} letterSpacing={'$xs'} >Tab One</Text>
-      <View
-        style={styles.separator}
-      />
-      <Link asChild href="/(tabs)/two">
-        <Button>
-          <ButtonText>GlueStack</ButtonText>
-        </Button>
-      </Link>
+      <Text lineHeight={"$lg"} letterSpacing={"$xs"}>
+        Tab One
+      </Text>
+      <View style={styles.separator} />
     </View>
   );
 }
