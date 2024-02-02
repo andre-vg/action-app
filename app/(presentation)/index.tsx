@@ -13,9 +13,10 @@ import {
   View,
 } from "@gluestack-ui/themed";
 import GenreCard from "@/components/GenreCard";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "expo-router";
 import * as Location from "expo-localization";
+import { UserContext } from "@/context/user";
 
 type Genres = {
   id: number;
@@ -27,12 +28,18 @@ export default function TabTwoScreen() {
     return Axios.get("genre/movie/list").then((res) => res.data.genres);
   };
 
+  const { setUser } = useContext(UserContext);
+
   const [choosenList, setChoosenList] = useState<Genres[]>([]);
 
   const queryGenres = useQuery({
     queryKey: ["genres"],
     queryFn: getGenres,
   });
+
+  const handlePress = () => {
+    setUser({ likedGenres: choosenList.map((genre) => genre.id) });
+  };
 
   return (
     <Box
@@ -63,8 +70,8 @@ export default function TabTwoScreen() {
               ))}
             </HStack>
           </VStack>
-          <Link asChild href={"/(tabs)"}>
-            <Button isDisabled={choosenList.length == 0}>
+          <Link asChild href={"/(presentation)/swipe"}>
+            <Button onPress={handlePress} isDisabled={choosenList.length == 0}>
               <ButtonText color="$white">Avançar </ButtonText>
               <ButtonIcon as={ArrowRightIcon} color="$white" />
             </Button>

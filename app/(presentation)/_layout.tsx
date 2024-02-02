@@ -10,7 +10,19 @@ export default function TabLayout() {
         <Stack.Screen
           name="index"
           options={{
-            navigationBarColor: config.tokens.colors.primary500,
+            headerShadowVisible: false,
+            headerTitleStyle: {
+              color: config.tokens.colors.white,
+            },
+            title: "Vamos começar!",
+            headerStyle: {
+              backgroundColor: config.tokens.colors.primary700,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="swipe"
+          options={{
             headerShadowVisible: false,
             headerTitleStyle: {
               color: config.tokens.colors.white,

@@ -23,6 +23,8 @@ import { GluestackUIProvider, Text, Box } from "@gluestack-ui/themed";
 import { config } from "../config/gluestack-ui.config";
 import { useColorScheme } from "@/components/useColorScheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createContext } from "react";
+import { UserProvider } from "@/context/user";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -76,11 +78,16 @@ function RootLayoutNav() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack initialRouteName={false?"(tabs)":"(presentation)"}>
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(presentation)" options={{ headerShown: false }} />
-          </Stack>
+          <UserProvider>
+            <Stack initialRouteName={false ? "(tabs)" : "(presentation)"}>
+              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(presentation)"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </UserProvider>
         </ThemeProvider>
       </GluestackUIProvider>
     </QueryClientProvider>

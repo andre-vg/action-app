@@ -30,7 +30,7 @@ export default function GenreCard({
         });
       }}
     >
-      <ButtonText color="$white" fontWeight="bold" size="xs">
+      <ButtonText color="$white" fontWeight="bold" size="md">
         {genre.name}
       </ButtonText>
     </Button>
