@@ -1,169 +1,74 @@
-import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
-import React from "react";
+import { useWindowDimensions } from "react-native";
+import { Card } from "react-native-card-stack-swiper";
 import {
-  GestureDetector,
-  Gesture,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
-
-import Animated, {
-  SharedValue,
-  interpolate,
-  runOnJS,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
-import { PanGesture } from "react-native-gesture-handler";
+  HStack,
+  Heading,
+  Image,
+  ImageBackground,
+  LinearGradient,
+  Text,
+  View,
+} from "@gluestack-ui/themed";
 import { Movie } from "@/app/(presentation)/swipe";
-
-const screenWidth = Dimensions.get("screen").width;
-export const tinderCardWidth = screenWidth * 0.8;
+import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient";
+import { MaterialIcons as Icon } from "@expo/vector-icons";
+import { config } from "@/config/gluestack-ui.config";
 
 type Props = {
-  movie: Movie | undefined;
+  movie: Movie;
   index: number;
-  numOfCards: number;
-  activeIndex: SharedValue<number>;
-    onResponse: (response: boolean) => void;
 };
 
-export default function SwipeCard({
-  movie,
-  index,
-  numOfCards,
-  activeIndex,
-  onResponse
-}: Props) {
-  const translationX = useSharedValue(0);
-
-  const animatedCard = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      activeIndex.value,
-      [index - 1, index, index + 1],
-      [1 - 1 / 5, 1, 1]
-    ),
-    transform: [
-      {
-        scale: interpolate(
-          activeIndex.value,
-          [index - 1, index, index + 1],
-          [0.95, 1, 1]
-        ),
-      },
-      {
-        translateY: interpolate(
-          activeIndex.value,
-          [index - 1, index, index + 1],
-          [-30, 0, 0]
-        ),
-      },
-      {
-        translateX: translationX.value,
-      },
-      {
-        rotateZ: `${interpolate(
-          translationX.value,
-          [-screenWidth / 2, 0, screenWidth / 2],
-          [-15, 0, 15]
-        )}deg`,
-      },
-    ],
-  }));
-
-  const gesture = Gesture.Pan()
-    .onChange((event) => {
-      translationX.value = event.translationX;
-
-      activeIndex.value = interpolate(
-        Math.abs(translationX.value),
-        [0, 500],
-        [index, index + 0.8]
-      );
-    })
-    .onEnd((event) => {
-      if (Math.abs(event.velocityX) > 400) {
-        translationX.value = withSpring(Math.sign(event.velocityX) * 500, {
-          velocity: event.velocityX,
-        });
-        activeIndex.value = withSpring(index + 1);
-
-        runOnJS(console.log)("swipe");
-      } else {
-        translationX.value = withSpring(0);
-      }
-    });
-
+export default function SwipeCard({ movie }: Props) {
+  const { width, height } = useWindowDimensions();
   return (
-    <GestureHandlerRootView style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-        width: "100%",
-    }}>
-      <GestureDetector gesture={gesture}>
-        <Animated.View
-          style={[
-            styles.card,
-            animatedCard,
-            {
-              zIndex: numOfCards - index,
-            },
+    //@ts-ignore
+    <Card
+      key={movie.id}
+      style={{
+        width: width * 0.9,
+        height: height * 0.8,
+      }}
+    >
+      <ImageBackground
+        source={{
+          uri: "https://image.tmdb.org/t/p/original" + movie?.poster_path,
+        }}
+        rounded={"$xl"}
+      >
+        <LinearGradient
+          //@ts-ignore
+          colors={[
+            "$transparent",
+            "$transparent",
+            "$transparent",
+            "$backgroundDarkMuted",
+            "$backgroundDarkMuted",
           ]}
+          as={ExpoLinearGradient}
+          h={"$full"}
+          flexDirection="column-reverse"
+          gap={"$2"}
+          p={"$4"}
         >
-          <Image
-            style={[StyleSheet.absoluteFillObject, styles.image]}
-            source={{
-              uri: "https://image.tmdb.org/t/p/original" + movie?.poster_path,
-            }}
-          />
-
-          <View style={styles.footer}>
-            <Text style={styles.name}>{movie?.title}</Text>
-          </View>
-        </Animated.View>
-      </GestureDetector>
-    </GestureHandlerRootView>
+          <HStack>
+            <HStack space="xs" pr={"$2"} pl={"$1"} py={"$1"} rounded={"$full"} bgColor="$trueGray700" alignItems="center">
+              <Icon name="grade" size={24} color={config.tokens.colors.light200} />
+              <Text color="$light200">{movie.vote_average.toPrecision(2)}</Text>
+            </HStack>
+          </HStack>
+          {movie.overview.length > 150 ? (
+            <Text color="$light200">
+              {movie?.overview.substring(0, 150)}...
+            </Text>
+          ) : (
+            <Text color="$light200">{movie?.overview}</Text>
+          )}
+          <Heading size="xl" color="$light200">
+            {movie?.title}
+          </Heading>
+        </LinearGradient>
+      </ImageBackground>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    width: tinderCardWidth,
-    height: tinderCardWidth * 1.67,
-    aspectRatio: 1 / 1.67,
-    borderRadius: 15,
-    justifyContent: "flex-end",
-
-    position: "absolute",
-
-    // shadow
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-
-    elevation: 3,
-  },
-  image: {
-    borderRadius: 15,
-  },
-  overlay: {
-    top: "50%",
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-  },
-  footer: {
-    padding: 10,
-  },
-  name: {
-    fontSize: 24,
-    color: "white",
-    fontFamily: "InterBold",
-  },
-});
